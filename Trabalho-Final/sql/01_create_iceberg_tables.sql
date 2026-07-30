@@ -1,3 +1,6 @@
+-- Tarefa 3 - Criar tabelas vazias
+
+
 -- clientes
 
 CREATE TABLE trabalho_final_aluno.clientes_iceberg (
