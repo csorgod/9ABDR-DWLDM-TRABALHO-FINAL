@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-23T14:00:00.000Z" agent="Claude" version="24.0.0" type="device">
+  <diagram name="Arquitetura-Trabalho-Final" id="arq-tf">
+    <mxGraphModel dx="2000" dy="1200" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1000" math="0" shadow="0" background="#F5F6F8">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Trabalho Final · Lakehouse Iceberg para a TPCH Trading" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="60" y="30" width="1200" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Pipeline ponta a ponta no Athena: do CSV no S3 ao top 5 clientes por receita liquida (com MERGE de CDC)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=0;fontFamily=Helvetica;fontColor=#687078;" vertex="1" parent="1">
+          <mxGeometry x="60" y="62" width="1200" height="22" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D4D7DB;fontFamily=Helvetica;fontSize=11;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="28" width="340" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" value="Legenda" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="1332" y="32" width="80" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-data-line" value="" style="endArrow=classic;html=1;strokeColor=#7AA116;strokeWidth=2;dashed=1;dashPattern=1 3;fontFamily=Helvetica;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1335" y="56" as="sourcePoint" />
+            <mxPoint x="1372" y="56" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-data-lbl" value="dados (CSV / Parquet)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="1378" y="48" width="140" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-meta-line" value="" style="endArrow=classic;html=1;strokeColor=#232F3E;strokeWidth=2;fontFamily=Helvetica;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1335" y="76" as="sourcePoint" />
+            <mxPoint x="1372" y="76" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-meta-lbl" value="metadado / catalogo" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="1378" y="68" width="130" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-merge-swatch" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D13212;strokeColor=#D13212;" vertex="1" parent="1">
+          <mxGeometry x="1530" y="52" width="16" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-merge-lbl" value="MERGE / OPTIMIZE" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="1552" y="48" width="110" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-deliv-swatch" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#009933;strokeColor=#009933;" vertex="1" parent="1">
+          <mxGeometry x="1530" y="72" width="16" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-deliv-lbl" value="entregavel da Marina" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="1552" y="68" width="120" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="col1-title" value="1 · Origem (Codespaces)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;fontFamily=Helvetica;fontColor=#687078;" vertex="1" parent="1">
+          <mxGeometry x="60" y="105" width="260" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="col2-title" value="2 · Camada bruto no S3" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;fontFamily=Helvetica;fontColor=#687078;" vertex="1" parent="1">
+          <mxGeometry x="360" y="105" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="col3-title" value="3 · Catalogacao + transformacao Iceberg" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;fontFamily=Helvetica;fontColor=#687078;" vertex="1" parent="1">
+          <mxGeometry x="680" y="105" width="540" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="col4-title" value="4 · Resultado consumido" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;fontFamily=Helvetica;fontColor=#687078;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="105" width="400" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cs-card" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D4D7DB;arcSize=6;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="200" width="260" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="cs-icon" value="" style="sketch=0;outlineConnect=0;gradientColor=none;fillColor=#232F3E;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloud9;" vertex="1" parent="1">
+          <mxGeometry x="166" y="220" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="cs-name" value="GitHub Codespaces" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="60" y="272" width="260" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cs-script1" value="setup_aluno.sh" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F6F8;strokeColor=#D4D7DB;fontSize=11;fontFamily=Courier New;fontColor=#232F3E;arcSize=6;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="300" width="220" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="cs-script2" value="generate_dataset.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F6F8;strokeColor=#D4D7DB;fontSize=11;fontFamily=Courier New;fontColor=#232F3E;arcSize=6;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="328" width="220" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="cs-detail" value="Cria bucket, gera 3 CSVs sinteticos&#10;e faz upload em prefixos&#10;separados por entidade." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontFamily=Helvetica;fontColor=#687078;" vertex="1" parent="1">
+          <mxGeometry x="60" y="358" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="cs-time" value="~10 min · Tarefa 1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F7EC;strokeColor=#7AA116;fontSize=10;fontStyle=1;fontFamily=Helvetica;fontColor=#5C7E10;arcSize=30;" vertex="1" parent="1">
+          <mxGeometry x="100" y="410" width="180" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s3-card" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D4D7DB;arcSize=6;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="200" width="280" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="s3-icon" value="" style="sketch=0;outlineConnect=0;gradientColor=none;fillColor=#7AA116;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="1">
+          <mxGeometry x="476" y="220" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="s3-name" value="Amazon S3" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="360" y="272" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="s3-bucket" value="tf-aluno-&lt;ACCOUNT_ID&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontFamily=Courier New;fontColor=#687078;" vertex="1" parent="1">
+          <mxGeometry x="360" y="292" width="280" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="s3-prefix1" value="bruto/clientes/clientes.csv&#10;10.000 linhas" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F7EC;strokeColor=#7AA116;fontSize=10;fontFamily=Courier New;fontColor=#232F3E;arcSize=6;align=left;spacingLeft=10;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="380" y="320" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="s3-prefix2" value="bruto/pedidos/pedidos.csv&#10;100.000 linhas" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F7EC;strokeColor=#7AA116;fontSize=10;fontFamily=Courier New;fontColor=#232F3E;arcSize=6;align=left;spacingLeft=10;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="380" y="366" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="s3-prefix3" value="bruto/pedidos_delta/pedidos_delta.csv&#10;5 linhas (3 INSERTs + 2 UPDATEs)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F7EC;strokeColor=#7AA116;fontSize=10;fontFamily=Courier New;fontColor=#232F3E;arcSize=6;align=left;spacingLeft=10;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="380" y="412" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="s3-time" value="Origem auditavel · CSV bruto" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;fontSize=10;fontStyle=2;fontFamily=Helvetica;fontColor=#687078;align=center;" vertex="1" parent="1">
+          <mxGeometry x="360" y="458" width="280" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="proc-boundary" value="database glue: trabalho_final_aluno" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#FF9900;fontFamily=Helvetica;fontSize=11;fontStyle=1;strokeWidth=2;dashed=1;align=right;verticalAlign=top;fontColor=#D77500;arcSize=4;spacingRight=12;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="680" y="180" width="540" height="540" as="geometry" />
+        </mxCell>
+
+        <mxCell id="glue-card" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D4D7DB;arcSize=6;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="220" width="240" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="glue-icon" value="" style="sketch=0;outlineConnect=0;gradientColor=none;fillColor=#8C4FFF;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.glue;" vertex="1" parent="1">
+          <mxGeometry x="796" y="236" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="glue-name" value="AWS Glue Crawler" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="700" y="288" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="glue-sub" value="tf-aluno-crawler  &#10;LabRole · on demand" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontFamily=Helvetica;fontColor=#687078;" vertex="1" parent="1">
+          <mxGeometry x="700" y="308" width="240" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="glue-tables-title" value="3 tabelas raw (Hive externa, CSV)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="700" y="345" width="240" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="glue-tables" value="clientes&#10;pedidos&#10;pedidos_delta" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F6F8;strokeColor=#D4D7DB;fontSize=11;fontFamily=Courier New;fontColor=#232F3E;arcSize=6;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="720" y="368" width="200" height="64" as="geometry" />
+        </mxCell>
+
+        <mxCell id="athena-card" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D4D7DB;arcSize=6;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="960" y="220" width="240" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="athena-icon" value="" style="sketch=0;outlineConnect=0;gradientColor=none;fillColor=#8C4FFF;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.athena;" vertex="1" parent="1">
+          <mxGeometry x="1056" y="236" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="athena-name" value="Amazon Athena" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="960" y="288" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="athena-sub" value="Query Editor v2&#10;Engine v3 · DDL+DML Iceberg" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontFamily=Helvetica;fontColor=#687078;" vertex="1" parent="1">
+          <mxGeometry x="960" y="308" width="240" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="athena-ops-title" value="Operacoes exercitadas" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="960" y="345" width="240" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="athena-ops" value="CREATE · INSERT · CAST AS DATE&#10;ALTER ADD COLUMNS · UPDATE&#10;CTAS · MERGE INTO · OPTIMIZE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F6F8;strokeColor=#D4D7DB;fontSize=10;fontFamily=Courier New;fontColor=#232F3E;arcSize=6;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="980" y="368" width="200" height="64" as="geometry" />
+        </mxCell>
+
+        <mxCell id="iceberg-tables-title" value="Tabelas Iceberg em s3://tf-aluno-&lt;ACCOUNT_ID&gt;/iceberg/" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="700" y="470" width="500" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="iceberg-cust" value="clientes_iceberg&#10;10.000 linhas&#10;Parquet + ZSTD" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F7FF;strokeColor=#0066CC;fontSize=11;fontFamily=Helvetica;fontColor=#232F3E;arcSize=6;align=center;verticalAlign=middle;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="700" y="500" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="iceberg-orders" value="pedidos_iceberg&#10;100.003 linhas (apos MERGE)&#10;valor_final materializado" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0E6FF;strokeColor=#6600CC;fontSize=11;fontFamily=Helvetica;fontColor=#232F3E;arcSize=6;align=center;verticalAlign=middle;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="870" y="500" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="iceberg-delta" value="pedidos_delta_iceberg&#10;5 linhas&#10;(intermediaria CTAS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF5E6;strokeColor=#CC7A00;fontSize=11;fontFamily=Helvetica;fontColor=#232F3E;arcSize=6;align=center;verticalAlign=middle;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="500" width="150" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="merge-arrow" style="endArrow=classic;html=1;strokeColor=#D13212;strokeWidth=3;fontFamily=Helvetica;fontSize=11;fontStyle=1;fontColor=#D13212;curved=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.85;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="iceberg-delta" target="iceberg-orders">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1125" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="merge-label" value="MERGE INTO ON id_pedido&#10;3 INSERTs + 2 UPDATEs" style="text;html=1;strokeColor=none;fillColor=#FFFFFF;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontFamily=Helvetica;fontColor=#D13212;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="455" width="180" height="32" as="geometry" />
+        </mxCell>
+
+        <mxCell id="optimize-card" value="OPTIMIZE BIN_PACK + VACUUM&#10;compactacao + limpeza de snapshots" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6E6;strokeColor=#D13212;fontSize=11;fontStyle=1;fontFamily=Helvetica;fontColor=#D13212;arcSize=6;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="700" y="595" width="500" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="proc-time" value="Tarefas 2-7 · ~110 min total" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF5E6;strokeColor=#FF9900;fontSize=10;fontStyle=1;fontFamily=Helvetica;fontColor=#D77500;arcSize=30;align=center;" vertex="1" parent="1">
+          <mxGeometry x="850" y="660" width="200" height="22" as="geometry" />
+        </mxCell>
+
+        <mxCell id="query-card" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D4D7DB;arcSize=6;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="200" width="380" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="query-icon" value="" style="sketch=0;outlineConnect=0;gradientColor=none;fillColor=#8C4FFF;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.athena;" vertex="1" parent="1">
+          <mxGeometry x="1426" y="220" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="query-name" value="Query Executiva (Tarefa 8)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="272" width="380" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="query-sub" value="JOIN clientes_iceberg + pedidos_iceberg" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontFamily=Courier New;fontColor=#687078;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="292" width="380" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="query-text" value="Top 5 clientes por receita liquida&#10;(soma valor_final)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6FFE6;strokeColor=#009933;fontSize=11;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;arcSize=6;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="320" width="340" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="decision-text" value="DECISION.md (Tarefa 9)&#10;ADR defendendo evolucao para 100x" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6FFE6;strokeColor=#009933;fontSize=11;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;arcSize=6;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="372" width="340" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="query-time" value="~40 min · Tarefas 8-9" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FBE6;strokeColor=#009933;fontSize=10;fontStyle=1;fontFamily=Helvetica;fontColor=#5C7E10;arcSize=30;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="420" width="160" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="marina-card" value="🗨 Marina (CFO TPCH Trading):&#10;«Top 5 clientes por receita liquida — com os deltas de CDC aplicados — para a apresentacao da sexta.»" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFBE6;strokeColor=#FFAA00;fontSize=11;fontFamily=Helvetica;fontColor=#232F3E;verticalAlign=middle;align=left;spacingLeft=10;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="465" width="380" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-cs-s3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#7AA116;strokeWidth=2;dashed=1;dashPattern=1 3;endArrow=classic;endFill=1;fontSize=10;fontStyle=1;fontColor=#5C7E10;" edge="1" parent="1" source="cs-card" target="s3-card">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="340" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow-cs-s3-lbl" value="upload CSV" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontFamily=Helvetica;fontColor=#5C7E10;strokeColor=none;fillColor=#F5F6F8;" vertex="1" parent="1">
+          <mxGeometry x="328" y="305" width="64" height="18" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-s3-glue" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.4;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;strokeColor=#232F3E;strokeWidth=2;endArrow=classic;endFill=1;fontSize=10;fontStyle=1;fontColor=#232F3E;" edge="1" parent="1" source="s3-card" target="glue-card">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-s3-glue-lbl" value="Crawler descobre&#10;schema CSV" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;strokeColor=none;fillColor=#F5F6F8;" vertex="1" parent="1">
+          <mxGeometry x="644" y="278" width="60" height="32" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-glue-athena" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#232F3E;strokeWidth=2;endArrow=classic;endFill=1;" edge="1" parent="1" source="glue-card" target="athena-card">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-glue-athena-lbl" value="metadado&#10;catalogo" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;strokeColor=none;fillColor=#F5F6F8;" vertex="1" parent="1">
+          <mxGeometry x="935" y="320" width="50" height="32" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-athena-cust" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#0066CC;strokeWidth=2;dashed=1;dashPattern=1 3;endArrow=classic;endFill=1;" edge="1" parent="1" source="athena-card" target="iceberg-cust">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-athena-orders" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#6600CC;strokeWidth=2;dashed=1;dashPattern=1 3;endArrow=classic;endFill=1;" edge="1" parent="1" source="athena-card" target="iceberg-orders">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-athena-delta" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.85;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#CC7A00;strokeWidth=2;dashed=1;dashPattern=1 3;endArrow=classic;endFill=1;" edge="1" parent="1" source="athena-card" target="iceberg-delta">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-orders-query" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#7AA116;strokeWidth=2;dashed=1;dashPattern=1 3;endArrow=classic;endFill=1;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1200" y="535" as="sourcePoint" />
+            <mxPoint x="1260" y="345" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1230" y="535" />
+              <mxPoint x="1230" y="345" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow-orders-query-lbl" value="JOIN" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontFamily=Helvetica;fontColor=#5C7E10;strokeColor=none;fillColor=#F5F6F8;" vertex="1" parent="1">
+          <mxGeometry x="1216" y="430" width="32" height="18" as="geometry" />
+        </mxCell>
+
+        <mxCell id="footer-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D4D7DB;arcSize=6;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="780" width="1600" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="footer-title" value="Fluxo pedagogico do trabalho final" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="80" y="790" width="600" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="footer-step1" value="1. Setup automatizado: dataset sintetico no S3." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="80" y="816" width="1560" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="footer-step2" value="2. Glue Crawler cataloga raws → CTAS Iceberg + ALTER + UPDATE + MERGE INTO + OPTIMIZE — pipeline lakehouse ponta a ponta no Athena." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="80" y="840" width="1560" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="footer-step3" value="3. Query executiva valida o trabalho — top 5 clientes por receita liquida; DECISION.md em ADR fecha o entregavel para a Marina." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontFamily=Helvetica;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="80" y="864" width="1560" height="22" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
