@@ -1,123 +1,143 @@
-# ADR-001: Uso de tabelas Apache Iceberg para armazenamento analítico
+# ADR-001: Particionamento mensal de `pedidos_iceberg` para suporte a 100× o volume atual
 
 - **Status:** Aceita
 - **Data:** 2026-08-06
 - **Decisores:** Grupo do trabalho
-- **Escopo:** Camada analítica de clientes e pedidos
+- **Escopo:** Evolução arquitetural da camada analítica de pedidos
+
+---
 
 ## Contexto
 
-O projeto recebe dados de clientes e pedidos em arquivos armazenados no Amazon S3. 
-Além da carga inicial, existe um conjunto de alterações incrementais na tabela 
-`pedidos_delta`, contendo registros novos e alterações de pedidos existentes.
+O pipeline atual processa **100.000 pedidos** e **10.000 clientes** armazenados no Amazon S3,
+consultados via Amazon Athena com tabelas no formato Apache Iceberg. A solução funciona
+adequadamente nesse volume, mas o negócio projeta crescimento para **10.000.000 de pedidos**
+(100× o volume atual) ao longo de 3 anos de operação.
 
-A solução precisava atender aos seguintes requisitos:
+Nesse cenário, toda consulta analítica que não se beneficia de pruning de partição passa a
+realizar varredura completa da tabela (`pedidos_iceberg`), o que aumenta:
 
-- armazenar os dados de forma analítica;
-- permitir consultas SQL pelo Amazon Athena;
-- realizar atualizações e inserções incrementais;
-- manter a consistência dos dados durante o processamento de CDC;
-- possibilitar otimização e manutenção das tabelas;
-- evitar a necessidade de reprocessar toda a tabela a cada alteração.
+- o tempo de resposta das queries;
+- o custo por consulta no Athena (cobrado por TB varrido);
+- o volume de dados lidos nas operações de `MERGE` e `OPTIMIZE`.
+
+A questão a decidir é: **qual estratégia de particionamento adotar em
+`pedidos_iceberg` para que o sistema continue eficiente com 10 milhões de registros?**
+
+---
 
 ## Decisão
 
-O grupo decidiu utilizar tabelas **Apache Iceberg** consultadas pelo **Amazon Athena**.
+Adotar **particionamento oculto (hidden partitioning) por mês** na coluna `data_pedido`
+da tabela `pedidos_iceberg`, utilizando a função de transformação `months(data_pedido)`
+disponível no Apache Iceberg.
 
-Foram criadas as tabelas:
+```sql
+CREATE TABLE pedidos_iceberg (
+    pedido_id    BIGINT,
+    cliente_id   BIGINT,
+    data_pedido  DATE,
+    status       VARCHAR(20),
+    valor        DECIMAL(10,2),
+    valor_final  DECIMAL(10,2)
+)
+LOCATION 's3://bucket/pedidos_iceberg/'
+TBLPROPERTIES (
+    'table_type'      = 'ICEBERG',
+    'write_compression' = 'snappy',
+    'partitioning'    = 'months(data_pedido)'
+);
+```
 
-- `clientes_iceberg`;
-- `pedidos_iceberg`.
+O particionamento por mês é oculto, ou seja, a coluna `data_pedido` permanece visível normalmente
+nas queries sem necessidade de coluna de partição separada. O Athena adiciona o filtro de
+expurgo (pruning) automaticamente quando a cláusula `WHERE` restringe o campo`data_pedido`.
 
-A carga inicial foi realizada a partir das tabelas catalogadas pelo AWS Glue. 
-Para o processamento incremental dos pedidos, foi utilizado o comando `MERGE`, 
-permitindo atualizar pedidos existentes e inserir novos pedidos na mesma operação.
+---
 
-A tabela `pedidos_iceberg` foi atualizada com os registros da tabela 
-`pedidos_delta`.
+## Alternativas consideradas e descartadas
 
-## Implementação realizada
+### 1. Sem particionamento (AS IS)
 
-A solução foi executada nas seguintes etapas:
+A tabela sem particionamento funciona bem com poucos registros (100k no nosso cenário).
 
-1. Catalogação dos arquivos de origem por meio do AWS Glue Crawler.
-2. Criação das tabelas Iceberg no banco `trabalho_final_aluno`.
-3. Carga inicial de 10.000 clientes.
-4. Carga inicial de 100.000 pedidos.
-5. Execução do `MERGE` para processamento dos 5 registros de CDC.
-6. Atualização de 2 pedidos existentes.
-7. Inserção de 3 novos pedidos.
-8. Execução de `OPTIMIZE` com `REWRITE DATA USING BIN_PACK`.
-9. Execução de `VACUUM` para manutenção das tabelas.
+Se fosse 100x, toda consulta que filtra por período realiza varredura completa de ~1,5 GB nos Parquets comprimidos. Isso elevaria o custo do athena diário de uma fração de centavos para algo na casa dos 7,50 dólares.
 
-## Evidências da execução
+Essa alternativa foi **descartada** porque o custo e o tempo de resposta crescem linearmente com o volume sem nenhum mecanismo de expurgo.
 
-Após o processamento do CDC, foram obtidos os seguintes resultados:
+---
 
-- Total inicial de pedidos: **100.000**;
-- Registros de CDC processados: **5**;
-- Pedidos atualizados: **2**;
-- Novos pedidos inseridos: **3**;
-- Total final de pedidos: **100.003**;
-- Total de clientes: **10.000**.
+### 2. Particionamento por dia (`days(data_pedido)`)
 
-A consulta executiva também foi executada para identificar os cinco clientes 
-com maior valor total gasto.
+Com 3 anos de dados e carga diária, seriam geradas ~1.095 partições. Com 10 milhões de pedidos, cada partição teria ~9.100 registros e ~1,4 MB, o que é muito abaixo do tamanho mínimo recomendado de 128 MB para arquivos Parquet eficientes.
 
-## Alternativas consideradas
+Consequências:
 
-### Arquivos Parquet sem formato de tabela
+- Milhares de arquivos pequenos no S3 (small files);
+- O`OPTIMIZE` precisaria de execuções frequentes e custosas para compactar as partições;
+- O overhead do planejador de queries aumentaria com o número de manifestos Iceberg.
 
-O uso direto de arquivos Parquet seria simples e adequado para cargas somente de 
-leitura. Entretanto, essa alternativa não oferece, de forma nativa, a mesma 
-facilidade para realizar atualizações e exclusões transacionais em registros 
-individuais.
+Essa alternativa também foi **descartada** por gerar granularidade excessiva e fragmentação de arquivos.
 
-### Tabela Hive tradicional
+---
 
-Uma tabela Hive poderia ser utilizada para consultas no Athena, mas exigiria 
-maior complexidade para controlar alterações, arquivos e consistência durante 
-processamentos incrementais.
+### 3. Particionamento por `cliente_id` (hash ou bucket)
 
-### Apache Iceberg
+A cardinalidade de `cliente_id` cresce junto com o volume. As queries analíticas típicas, como por exemplo os top 5 clientes por receita, acessam múltiplos clientes simultaneamente, exigindo leitura de muitas partições de uma só vez.
 
-O Iceberg foi escolhido por oferecer:
+Além disso, o número de arquivos por partição seria muito pequeno, na casa de 10 pedidos por cliente em média, resultando no mesmo problema de small files da alternativa anterior.
 
-- suporte a operações de `INSERT`, `UPDATE`, `DELETE` e `MERGE`;
-- evolução de esquema;
-- controle de snapshots;
-- maior consistência para cargas incrementais;
-- integração com o Amazon Athena;
-- possibilidade de otimização e limpeza por meio de `OPTIMIZE` e `VACUUM`.
+**Descartamos** essa opção porque o pruning não faria diferença por cliente_id em queries de agregação.
 
-## Consequências positivas
+---
 
-- O CDC pode ser processado sem recarregar todos os pedidos.
-- A operação `MERGE` trata atualizações e inserções em uma única consulta.
-- As tabelas podem ser consultadas diretamente com SQL no Athena.
-- A manutenção dos arquivos pode ser realizada com `OPTIMIZE` e `VACUUM`.
-- O histórico baseado em snapshots oferece maior controle sobre as alterações.
+### 4. Particionamento por `status`
 
-## Consequências negativas e cuidados
+O campo `status` possui poucos valores distintos (ex.: `PENDENTE`, `PAGO`, `CANCELADO`).
+Uma partição por status agruparia milhões de registros sem reduzir o volume varrido
+nas queries mais comuns, que filtram por intervalo de datas.
 
-- As tabelas exigem rotinas periódicas de manutenção.
-- O uso incorreto de `VACUUM` pode remover snapshots necessários para consultas 
-  ou auditorias.
-- É necessário controlar corretamente a chave de correspondência utilizada no 
-  `MERGE`.
-- Consultas e operações de manutenção podem gerar custos no Amazon Athena.
-- O formato exige conhecimento específico sobre tabelas Iceberg e seus comandos 
-  de manutenção.
+**Descartamos também** porque não reduz o custo de scan nas queries analíticas predominantes.
 
-## Resultado
+---
 
-A decisão foi considerada adequada para o escopo do trabalho. A solução permitiu 
-realizar a carga inicial, processar corretamente o CDC e finalizar com 
-**100.003 pedidos** e **10.000 clientes**, mantendo as tabelas disponíveis para 
-consultas analíticas no Amazon Athena.
+## Justificativa da decisão
+
+O particionamento mensal equilibra três fatores:
+
+**Granularidade adequada:** com 3 anos de histórico, são geradas ~36 partições. Cada
+partição contém ~278.000 registros e ocupa ~43 MB comprimido, o que consideramos dentro da faixa ideal de 128 MB a 512 MB após o comando`OPTIMIZE REWRITE DATA USING BIN_PACK`.
+
+**Pruning eficiente para o padrão de acesso real:** queries de fechamento mensal,
+relatórios trimestrais e análises de tendência filtram naturalmente por intervalos de
+datas, eliminando automaticamente as partições fora do intervalo.
+
+**Compatibilidade com `MERGE` incremental:** os deltas de CDC chegam com o`data_pedido` mais  recente. O Iceberg reescreve apenas os arquivos da partição afetada, sem a necessidade de reescrever a tabela inteira.
+
+---
+
+## Consequências
+
+**Positivas:**
+
+- Redução de ~92% no volume varrido por queries com filtro temporal.
+- `MERGE` reescreve apenas arquivos da partição do delta, reduzindo custo e tempo.
+- O crescimento de novas partições é previsível e controlado (1 partição/mês).
+- Nenhuma alteração na interface SQL: as queries existentes continuam funcionando sem modificação.
+
+**Negativas:**
+
+- A criação da tabela precisa incluir a cláusula `partitioning` desde o início;
+  adicionar particionamento a uma tabela Iceberg existente exige recriação com CTAS.
+- Queries sem filtro em `data_pedido` continuam varrendo todas as partições.
+- O `OPTIMIZE` deve ser executado por partição (com filtro de data) para evitar
+  reescrever toda a tabela de uma vez.
+- O `VACUUM` deve respeitar um período mínimo de retenção compatível com a janela
+  de auditoria exigida pelo negócio.
+
+---
 
 ## Conclusão
 
-O grupo adotou o Apache Iceberg como formato de tabela para equilibrar 
-flexibilidade analítica, suporte a atualizações incrementais e integração com os 
-serviços AWS utilizados no projeto.
+A adoção de particionamento oculto por mês em `pedidos_iceberg` é a estratégia que
+melhor equilibra custos, performance e simplicidade de manutenção pensando em registros na casa de 100x o volume atual. As alternativas avaliadas ou não reduzem o custo de scan, ou geram fragmentação de arquivos, o que seria prejudicial para o projeto.
